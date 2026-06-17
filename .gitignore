@@ -1,0 +1,32 @@
+# === 實驗執行後產生的輸出檔（由 notebook 重新生成，不需版控）===
+exp5_dataset_model_comparison.csv
+exp7_dataset_c_detailed.csv
+betting_all_experiments.csv
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# === 虛擬環境 ===
+.venv/
+venv/
+env/
+ENV/
+
+# === 模型 / 中繼檔 ===
+*.joblib
+*.pkl
+
+# === 套件版本鎖定（選擇性產生）===
+requirements.lock.txt
+
+# === 作業系統 / 編輯器 ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === （選用）若不想把 20MB 的大型原始資料 commit 進 repo，取消下一行註解 ===
+# data/nba_games_331.csv
