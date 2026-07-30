@@ -1,10 +1,6 @@
-numpy
-pandas
-scipy
-scikit-learn
-xgboost
-matplotlib
-
-# 執行 notebook 所需
-jupyter
-notebook
+pandas==3.0.1
+numpy==2.4.2
+scikit-learn==1.8.0
+xgboost==3.2.0
+matplotlib==3.10.8
+scipy==1.17.1
