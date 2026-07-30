@@ -1,7 +1,6 @@
 # === 實驗執行後產生的輸出檔（由 notebook 重新生成，不需版控）===
-exp5_dataset_model_comparison.csv
-exp7_dataset_c_detailed.csv
-betting_all_experiments.csv
+outputs/*
+!outputs/.gitkeep
 
 # === Python ===
 __pycache__/
@@ -28,5 +27,3 @@ Thumbs.db
 .vscode/
 .idea/
 
-# === （選用）若不想把 20MB 的大型原始資料 commit 進 repo，取消下一行註解 ===
-# data/nba_games_331.csv
