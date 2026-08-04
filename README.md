@@ -2,7 +2,7 @@
 
 > 基於機器學習之 NBA 勝負預測：從預測準度到投注報酬
 
-此repository為這篇碩士論文的實驗程式碼。研究在 NBA 勝負預測場景上同時評估**預測準確度（accuracy，過往文獻主流指標）**與**投注報酬率（betting ROI，本研究擴充之維度）**，並觀察到兩者之間的**解耦現象**：在本研究的評估中，準確度最低的模型反而取得最高的投注報酬。
+此 repository 為這篇碩士論文的實驗程式碼。研究在 NBA 勝負預測場景上同時評估**預測準確度（accuracy，過往文獻主流指標）**與**投注報酬率（betting ROI，本研究擴充之維度）**，並觀察到兩者之間的**解耦現象**：在本研究的評估中，準確度最低的模型反而取得最高的投注報酬。
 
 ---
 
@@ -24,56 +24,86 @@
 - **特徵帶來的準確度提升**：加入新計算特徵後，跨七個模型的平均準確度由 `0.6334`（baseline）提升至 `0.6547`（+2.13 pp）。
 - **單一最高準確度**：Stacking Classifier 搭配完整特徵（dataset a′）達 `67.62%`。
 - **準確度 vs. 報酬的解耦**：XGBoost 搭配精簡特徵（dataset c）的準確度為 `63.46%`，為七個模型中最低；但在投注模擬中，XGBoost 於樣本外賽季（2025-26，至 2026/3/31）以 Exp4 策略取得 ROI `+15.53%`，為各模型最高。
-- **對照 baseline**：同期「一律下注熱門方（Favorite baseline）」的 ROI 為 `−3.37%`，本研究策略領先約 `+18.90 pp`。樣本外期間 XGBoost 下注 134 場、命中 69 場、命中率 51.5%。
+- **對照 baseline**：同期「一律下注熱門方（Favorite baseline）」的 ROI 為 `-3.37%`，本研究策略領先約 `+18.90 pp`。樣本外期間 XGBoost 下注 134 場、命中 69 場、命中率 51.5%。
 
-這顯示在投注情境下，單純追求預測準確度未必等同於追求獲利——過往多數預測文獻聚焦於 accuracy，較少系統性地延伸到投注 ROI，本研究在同一框架下同時檢視兩者並呈現此差異。
+這顯示在投注情境下，單純追求預測準確度未必等同於追求獲利—過往多數預測文獻聚焦於 accuracy，較少系統性地延伸到投注 ROI，本研究在同一框架下同時檢視兩者並呈現此差異。
 
 ---
 
 ## 專案結構
 
 ```
-nba-prediction-betting/
-├── README.md                              # 本說明檔
-├── requirements.txt                       # Python 套件需求
-├── .gitignore                             # 忽略產生的輸出檔與環境檔
-├── LICENSE                                # 程式碼授權（MIT）
-├── NBA_prediction_betting_clean.ipynb     # 完整實驗 notebook（主程式）
-└── data/
-    ├── README.md                          # 資料字典與來源說明
-    ├── nba_games_331.csv          # 比賽資料（含特徵工程後欄位）
-    └── cbs_moneyline_2024_2026_331.csv  # CBS Sports moneyline 賠率
+nba-prediction/
+├── README.md                             # 本說明檔
+├── REPRODUCIBILITY.md                    # 跨平台可重現性驗證報告
+├── requirements.txt                      # Python 套件需求（版本已鎖定）
+├── .gitignore                            # 忽略產生的輸出檔與環境檔
+├── LICENSE                               # 程式碼授權（MIT）
+├── NBA_prediction_betting_clean.ipynb    # 完整實驗 notebook（主程式）
+├── data/
+│   ├── nba_games_331.csv                 # 比賽資料（含特徵工程後欄位）
+│   └── cbs_moneyline_2024_2026_331.csv   # CBS Sports moneyline 賠率
+└── outputs/                              # 執行產物（不進版控，執行時自動生成）
+    ├── exp5_dataset_model_comparison.csv
+    ├── exp7_dataset_c_detailed.csv
+    ├── betting_all_experiments.csv
+    ├── exp6_grouped_bar_accuracy.png
+    └── top_features_dataset_{b,c,d}.png
 ```
 
 ---
 
 ## 環境需求與安裝
 
-建議使用 Python 3.10 以上版本。
+**需要 Python 3.11 以上**（`numpy 2.4` 與 `pandas 3.0` 不支援更舊的版本）。
+論文實驗使用 Python 3.14，建議以相同版本執行。
+
+`requirements.txt` 已鎖定所有直接依賴的確切版本，以確保結果可重現。
+
+### 方式一：使用 [uv](https://github.com/astral-sh/uv)（建議）
+
+uv 可自動下載指定的 Python 版本，不需事先安裝：
 
 ```bash
-# 1. 建立虛擬環境
+uv venv --python 3.14
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
+```
+
+### 方式二：使用內建 venv
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
-
-# 2. 安裝套件
 pip install -r requirements.txt
 ```
 
-> **備註**：實驗結果對 `scikit-learn` 與 `xgboost` 版本敏感，不同版本可能造成小數點後的差異（例如 STACK + dataset a′ 在部分版本為 `67.25%` 而非 `67.62%`）。若需完全重現論文數字，請以論文撰寫當時的套件版本為準。
+> **關於數值重現性**：本專案已在 Windows 與 Linux 兩個環境下完整驗證。
+> 核心結果完全一致，但 35 組實驗中有 14 組出現小數點後的差異，
+> 根因為底層數值函式庫（BLAS）的浮點運算差異透過迭代求解器與特徵選擇被放大。
+> 完整的比對結果與根因分析請見 **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)**。
 
 ---
 
 ## 如何執行
 
-**從專案根目錄**啟動 Jupyter（notebook 內的資料路徑以根目錄為基準，例如 `data/nba_games_331.csv`）：
+**從專案根目錄**啟動（notebook 內的資料路徑以根目錄為基準，例如 `data/nba_games_331.csv`）：
 
 ```bash
-jupyter notebook NBA_prediction_betting_clean.ipynb
-# 或
 jupyter lab
+# 或
+jupyter notebook NBA_prediction_betting_clean.ipynb
 ```
 
+亦可不開啟介面，直接由命令列完整執行：
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace NBA_prediction_betting_clean.ipynb
+```
+
+> 完整執行約需 85 分鐘（AMD Ryzen 7 PRO 4750U，8 核 16 緒）。
+> 最耗時的環節為 dataset c 的 RFECV 特徵選擇。
+> 所有產物會輸出至 `outputs/`。
 
 ---
 
@@ -86,7 +116,7 @@ jupyter lab
 | 3. 訓練／開發／樣本外切分 | 訓練集 2016-17～2023-24；開發集 2024-25（1,170 場）；樣本外 2025-26（995 場） |
 | 4. 五組資料集（a / a′ / b / c / d） | baseline、完整特徵、Pearson 過濾、RFECV 包裹、ElasticNetCV 嵌入 |
 | 5. 勝負預測實驗 | 七個模型：Lasso、Logistic、Ridge、Linear SVM、Random Forest、XGBoost、Stacking Classifier |
-| 6. 投注模擬實驗 | 三道篩網（共識 + 分數帶 + EV/Kelly）× 四種策略（Exp1–Exp4） |
+| 6. 投注模擬實驗 | 三道篩網（共識 + 分數帶 + EV/Kelly）× 四種策略（Exp1-Exp4） |
 
 ---
 
