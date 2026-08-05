@@ -1,0 +1,20 @@
+# 複製本檔為 terraform.tfvars 後填入實際值。
+# terraform.tfvars 已排除於版本控制之外（見 .gitignore）。
+#
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# 取得目前對外 IP：
+#
+#   curl -s https://checkip.amazonaws.com
+#
+# 將結果加上 /32 後填入下方。若網路環境的 IP 會變動（如行動網路），
+# 變更後需重新 terraform apply 以更新安全群組規則。
+
+allowed_ssh_cidr = "203.0.113.45/32"
+
+# 以下皆有預設值，需要時才覆寫：
+#
+# aws_region       = "ap-northeast-1"
+# instance_type    = "t3.micro"
+# root_volume_size = 20
+# public_key_path  = "~/.ssh/id_ed25519.pub"

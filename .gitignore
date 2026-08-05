@@ -27,3 +27,12 @@ Thumbs.db
 .vscode/
 .idea/
 
+# === Terraform ===
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+tfplan
