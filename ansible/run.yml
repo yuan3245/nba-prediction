@@ -1,0 +1,77 @@
+---
+# ============================================================================
+# 於 EC2 主機執行實驗並取回產物
+#
+#   ansible-playbook run.yml
+#
+# 本 playbook 有副作用，非冪等 —— 每次執行都會重新計算。
+# 因此與 provision.yml 分離：組態收斂與任務執行的性質不同。
+# ============================================================================
+
+- name: Run experiment and retrieve artifacts
+  hosts: experiment
+  gather_facts: true
+
+  vars:
+    project_dir: "/home/ubuntu/nba-prediction"
+    local_results_dir: "../outputs/ec2"
+    # 實驗於 16 執行緒環境約需 85 分鐘；此處預留充裕上限
+    experiment_timeout: 14400
+
+  tasks:
+    - name: Show host specification before run
+      ansible.builtin.debug:
+        msg: >-
+          Running on {{ ansible_processor_vcpus }} vCPU,
+          {{ (ansible_memtotal_mb / 1024) | round(1) }} GB RAM
+
+    # ------------------------------------------------------------------
+    # 非同步執行：實驗耗時遠超過 SSH 連線的常見逾時設定。
+    # async 讓工作在遠端背景執行，poll 定期回報狀態。
+    # ------------------------------------------------------------------
+    - name: Execute experiment
+      ansible.builtin.shell: |
+        set -o pipefail
+        cd {{ project_dir }}
+        source .venv/bin/activate
+        python src/run_experiment.py 2>&1 | tee outputs/run.log
+      args:
+        executable: /bin/bash
+      async: "{{ experiment_timeout }}"
+      poll: 60
+      register: experiment
+
+    - name: Show last lines of experiment output
+      ansible.builtin.debug:
+        msg: "{{ experiment.stdout_lines[-8:] }}"
+
+    # ------------------------------------------------------------------
+    # 取回產物
+    #
+    # flat=true 搭配結尾斜線可避免 fetch 建立以主機名為名的巢狀目錄。
+    # ------------------------------------------------------------------
+    - name: Find generated artifacts
+      ansible.builtin.find:
+        paths: "{{ project_dir }}/outputs"
+        patterns:
+          - "*.csv"
+          - "*.txt"
+          - "*.json"
+          - "*.log"
+      register: artifacts
+
+    - name: Fetch artifacts to local machine
+      ansible.builtin.fetch:
+        src: "{{ item.path }}"
+        dest: "{{ local_results_dir }}/"
+        flat: true
+      loop: "{{ artifacts.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+
+    - name: Summarise
+      ansible.builtin.debug:
+        msg: >-
+          Retrieved {{ artifacts.files | length }} artifacts to
+          {{ local_results_dir }}. Compare against the local run to assess
+          cross-hardware reproducibility.

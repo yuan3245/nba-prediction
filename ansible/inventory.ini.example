@@ -1,0 +1,21 @@
+# Ansible 主機清單。
+#
+# 本檔應由 Terraform 輸出自動產生，不手動維護：
+#
+#   cd ../infra
+#   terraform output -raw public_ip | \
+#     xargs -I{} printf '[experiment]\n%s\n' {} > ../ansible/inventory.ini
+#
+# 產生結果形如：
+#
+#   [experiment]
+#   13.196.211.54
+#
+# 連線參數（使用者、金鑰路徑）統一定義於 ansible.cfg，
+# 因此本檔僅需列出位址。
+#
+# inventory.ini 已排除於版本控制之外 —— IP 隨每次 apply 而異，
+# 屬於環境狀態而非專案設定。
+
+[experiment]
+203.0.113.45

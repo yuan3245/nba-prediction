@@ -36,3 +36,6 @@ Thumbs.db
 !*.tfvars.example
 crash.log
 tfplan
+# === Ansible ===
+ansible/inventory.ini
+outputs/ec2/
