@@ -1,0 +1,155 @@
+[run_experiment] 輸出目錄：outputs
+[run_experiment] 執行緒設定：全部核心
+======================================================================
+套件與設定載入完成
+資料載入完成：27960 筆紀錄，136 欄
+團隊爆發力指標（gmsc_max / per_max）已建立
+Elo 已注入；elo 範圍 1215.5 ~ 1825.8
+賽程／旅行特徵已注入（14 個原始特徵不參與滾動）
+滾動特徵 270 欄已建立
+對戰合併完成：full = (24842, 713)
+訓練集 20514 列；測試集 4328 列
+測試集去重後獨立比賽：合併 2165 場（2024-25 1181 / 2025-26 984）
+候選特徵總數：703（原始/滾動 655，新計算特徵 48）
+dataset a  : 655 特徵
+dataset a' : 703 特徵
+dataset b (Pearson |r| >= 0.03): 389 特徵
+dataset c (RFECV): 28 特徵（CV 最佳 AUC = 0.7111）
+dataset c: 特徵清單已寫入 outputs/dataset_c_features.txt
+dataset d (ElasticNetCV): 232 特徵（最佳 C=0.04642, l1_ratio=0.30）
+
+五組資料集特徵數：
+  dataset a  :  655
+  dataset a' :  703
+  dataset b  :  389
+  dataset c  :   28
+  dataset d  :  232
+各資料集跨模型平均 Acc：
+         Acc_2425  Acc_2526  Acc_all
+Dataset                             
+a          0.6364    0.6282   0.6327
+a'         0.6589    0.6495   0.6546
+b          0.6534    0.6514   0.6525
+c          0.6580    0.6536   0.6560
+d          0.6498    0.6545   0.6519
+
+a → a' 合併 Acc：0.6327 → 0.6546（+2.19 pp）
+單一最高 Acc：Stacking Classifier + dataset a' = 67.58%
+勝負預測階段完整結果：五組資料集 × 七個模型之 Accuracy（論文表 7）
+========================================================================
+Dataset  Model                   ACC (24-25)  ACC (25-26)   ACC (all)
+------------------------------------------------------------------------
+a        Lasso (L1 Logistic)          0.6461       0.6413      0.6439
+         Logistic Regression          0.6418       0.6362      0.6393
+         Ridge Regression             0.6410       0.6280      0.6351
+         Random Forest                0.6198       0.6098      0.6152
+         XGBoost                      0.6063       0.6077      0.6069
+         SVM (Linear)                 0.6511       0.6250      0.6393
+         Stacking Classifier          0.6486       0.6494      0.6490
+------------------------------------------------------------------------
+a'       Lasso (L1 Logistic)          0.6638       0.6626      0.6633
+         Logistic Regression          0.6664       0.6606      0.6637
+         Ridge Regression             0.6638       0.6514      0.6582
+         Random Forest                0.6444       0.6311      0.6383
+         XGBoost                      0.6342       0.6250      0.6300
+         SVM (Linear)                 0.6622       0.6423      0.6531
+         Stacking Classifier          0.6774       0.6738      0.6758
+------------------------------------------------------------------------
+b        Lasso (L1 Logistic)          0.6681       0.6616      0.6651
+         Logistic Regression          0.6638       0.6575      0.6610
+         Ridge Regression             0.6596       0.6443      0.6527
+         Random Forest                0.6367       0.6433      0.6397
+         XGBoost                      0.6181       0.6250      0.6212
+         SVM (Linear)                 0.6605       0.6524      0.6568
+         Stacking Classifier          0.6672       0.6758      0.6711
+------------------------------------------------------------------------
+c        Lasso (L1 Logistic)          0.6647       0.6565      0.6610
+         Logistic Regression          0.6638       0.6535      0.6591
+         Ridge Regression             0.6655       0.6535      0.6600
+         Random Forest                0.6486       0.6565      0.6522
+         XGBoost                      0.6325       0.6372      0.6346
+         SVM (Linear)                 0.6638       0.6545      0.6596
+         Stacking Classifier          0.6672       0.6636      0.6656
+------------------------------------------------------------------------
+d        Lasso (L1 Logistic)          0.6588       0.6677      0.6628
+         Logistic Regression          0.6579       0.6626      0.6600
+         Ridge Regression             0.6588       0.6555      0.6573
+         Random Forest                0.6334       0.6413      0.6370
+         XGBoost                      0.6224       0.6341      0.6277
+         SVM (Linear)                 0.6554       0.6494      0.6527
+         Stacking Classifier          0.6622       0.6707      0.6661
+------------------------------------------------------------------------
+已儲存 exp6_grouped_bar_accuracy.png
+實驗 7 — dataset c 各模型詳細指標（%）：
+          Algorithm  Accuracy (%)  Precision (%)  Recall (%)  F1-Score (%)
+Stacking Classifier         66.56          66.26       78.63         71.92
+Lasso (L1 Logistic)         66.10          65.75       78.80         71.68
+   Ridge Regression         66.00          65.74       78.46         71.54
+       SVM (Linear)         65.96          65.48       79.30         71.73
+Logistic Regression         65.91          65.56       78.80         71.57
+      Random Forest         65.22          66.14       74.05         69.87
+            XGBoost         63.46          64.92       71.59         68.09
+已儲存 top_features_dataset_b.png
+已儲存 top_features_dataset_c.png
+已儲存 top_features_dataset_d.png
+投注實驗將使用 dataset c（28 個特徵）
+
+dataset c 之全部 28 個特徵（依 RFECV 基底 Logistic Regression 係數絕對值排序）：
+  #1  elo_diff_10_x            |coef| = 1.6589
+  #2  3pa_opp_5_x              |coef| = 1.5752
+  #3  3pa_opp_5_y              |coef| = 1.5494
+  #4  3p_opp_5_y               |coef| = 1.5001
+  #5  3p_opp_5_x               |coef| = 1.4903
+  #6  drtg_5_x                 |coef| = 1.3131
+  #7  elo_diff_5_x             |coef| = 1.2623
+  #8  pts_max_5_x              |coef| = 1.1915
+  #9  elo_diff_5_y             |coef| = 1.1708
+  #10 pts_max_5_y              |coef| = 1.1228
+  #11 elo_opp_5_y              |coef| = 1.1109
+  #12 elo_opp_5_x              |coef| = 1.0759
+  #13 elo_y                    |coef| = 0.9518
+  #14 fg%_10_x                 |coef| = 0.9178
+  #15 fta_max_opp              |coef| = 0.8841
+  #16 fg%_10_y                 |coef| = 0.8696
+  #17 elo_diff_10_y            |coef| = 0.7784
+  #18 elo_opp_10_x             |coef| = 0.7563
+  #19 fg_max_5_x               |coef| = 0.6742
+  #20 home_next                |coef| = 0.6696
+  #21 ft_max_opp               |coef| = 0.6450
+  #22 3pa_max_5_x              |coef| = 0.6214
+  #23 3pa_10_x                 |coef| = 0.6084
+  #24 ortg_opp_5_y             |coef| = 0.5994
+  #25 drtg_5_y                 |coef| = 0.5994
+  #26 3p_max_5_x               |coef| = 0.5944
+  #27 fg_max_5_y               |coef| = 0.5898
+  #28 3par_10_y                |coef| = 0.4868
+賠率資料：2456 場（2024-25 1321 / 2025-26 1135）
+與測試集成功合併 2165 場；target vs home_win 一致率 99.7%
+七個模型之原始版與校準版已訓練完成
+投注函數已定義
+共識資料：2024-25 1165 場，2025-26 995 場
+分數帶 (L, U) = (0.4, 0.6)（開發集 Stacking Classifier 掃描選定）
+=== 2024-25 開發集：七模型 × 四策略 ROI (%) ===
+Experiment           Exp1 (僅EV/Kelly)  Exp2 (+Cons)  Exp3 (+Band)  Exp4 (+Cons+Band)
+Model                                                                               
+Logistic Regression             -0.78         -1.26          3.65               3.07
+Ridge Regression                -2.02         -0.72          5.75               4.21
+Lasso (L1 Logistic)             -1.24         -1.39          3.41               4.35
+SVM (Linear)                    -1.50         -1.13          2.85               1.64
+Random Forest                    3.23          9.23          4.62               8.36
+XGBoost                         -3.64         10.73         -0.25              13.55
+Stacking Classifier             -1.61         -0.46          4.61               3.29
+Exp4 策略下七個模型於 2024-25 開發集之下注詳情（論文表 14）
+======================================================================
+投注模擬實驗總結
+======================================================================
+  賽季：2024-25（開發集）與 2025-26（樣本外，至 3/31）
+  初始資金：$10,000 ｜ Fractional Kelly α = 0.05（1/20）
+  共識門檻 CONF = 0.51 ｜ 分數帶 (L, U) = (0.4, 0.6)
+  賠率來源：CBS Sports Moneyline（去水後之公平賠率結算）
+  場次：2024-25 = 1165，2025-26 = 995
+
+最佳組合 — XGBoost + Exp4 於兩季之表現對比（論文表 15）：
+======================================================================
+[run_experiment] 環境指紋已寫入：outputs/environment.json
+[run_experiment] 完成，總耗時 65.1 分鐘

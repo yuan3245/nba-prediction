@@ -1,0 +1,30 @@
+# dataset c 特徵清單，由 RFECV 產生
+# CV 最佳 AUC = 0.7111
+ft_max_opp
+fta_max_opp
+fg%_10_x
+3pa_10_x
+elo_opp_10_x
+elo_diff_10_x
+drtg_5_x
+fg_max_5_x
+3p_max_5_x
+3pa_max_5_x
+pts_max_5_x
+3p_opp_5_x
+3pa_opp_5_x
+elo_opp_5_x
+elo_diff_5_x
+home_next
+fg%_10_y
+3par_10_y
+elo_diff_10_y
+drtg_5_y
+fg_max_5_y
+pts_max_5_y
+3p_opp_5_y
+3pa_opp_5_y
+ortg_opp_5_y
+elo_opp_5_y
+elo_diff_5_y
+elo_y

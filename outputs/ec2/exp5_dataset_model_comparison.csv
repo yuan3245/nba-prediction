@@ -1,0 +1,36 @@
+Dataset,Model,Acc_2425,Acc_2526,Acc_all,AUC_all
+a,Lasso (L1 Logistic),0.6461,0.6413,0.6439,0.6989
+a,Logistic Regression,0.6418,0.6362,0.6393,0.6959
+a,Ridge Regression,0.641,0.628,0.6351,0.6926
+a,Random Forest,0.6198,0.6098,0.6152,0.6594
+a,XGBoost,0.6063,0.6077,0.6069,0.6373
+a,SVM (Linear),0.6511,0.625,0.6393,0.6904
+a,Stacking Classifier,0.6486,0.6494,0.649,0.6985
+a',Lasso (L1 Logistic),0.6638,0.6626,0.6633,0.7143
+a',Logistic Regression,0.6664,0.6606,0.6637,0.7122
+a',Ridge Regression,0.6638,0.6514,0.6582,0.7091
+a',Random Forest,0.6444,0.6311,0.6383,0.686
+a',XGBoost,0.6342,0.625,0.63,0.6575
+a',SVM (Linear),0.6622,0.6423,0.6531,0.7043
+a',Stacking Classifier,0.6774,0.6738,0.6758,0.7159
+b,Lasso (L1 Logistic),0.6681,0.6616,0.6651,0.7149
+b,Logistic Regression,0.6638,0.6575,0.661,0.7126
+b,Ridge Regression,0.6596,0.6443,0.6527,0.7106
+b,Random Forest,0.6367,0.6433,0.6397,0.69
+b,XGBoost,0.6181,0.625,0.6212,0.661
+b,SVM (Linear),0.6605,0.6524,0.6568,0.7086
+b,Stacking Classifier,0.6672,0.6758,0.6711,0.7167
+c,Lasso (L1 Logistic),0.6647,0.6565,0.661,0.7107
+c,Logistic Regression,0.6638,0.6535,0.6591,0.711
+c,Ridge Regression,0.6655,0.6535,0.66,0.7105
+c,Random Forest,0.6486,0.6565,0.6522,0.6953
+c,XGBoost,0.6325,0.6372,0.6346,0.6609
+c,SVM (Linear),0.6638,0.6545,0.6596,0.7105
+c,Stacking Classifier,0.6672,0.6636,0.6656,0.7118
+d,Lasso (L1 Logistic),0.6588,0.6677,0.6628,0.7137
+d,Logistic Regression,0.6579,0.6626,0.66,0.7119
+d,Ridge Regression,0.6588,0.6555,0.6573,0.7107
+d,Random Forest,0.6334,0.6413,0.637,0.6964
+d,XGBoost,0.6224,0.6341,0.6277,0.6613
+d,SVM (Linear),0.6554,0.6494,0.6527,0.7085
+d,Stacking Classifier,0.6622,0.6707,0.6661,0.7142
