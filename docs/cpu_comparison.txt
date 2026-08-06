@@ -1,0 +1,10 @@
+=== 本機 WSL2 ===
+CPU(s):                                  16
+Model name:                              AMD Ryzen 7 PRO 4750U with Radeon Graphics
+nproc: 16
+
+=== EC2 c7i.2xlarge ===
+35.79.24.137 | CHANGED | rc=0 >>
+CPU(s):                                  8
+Model name:                              Intel(R) Xeon(R) Platinum 8488C
+nproc: 8
