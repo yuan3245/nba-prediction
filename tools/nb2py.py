@@ -29,8 +29,9 @@ NBA 勝負預測與投注策略 — 完整實驗流程
     OUTPUT_DIR           產物輸出目錄，預設 outputs
     EXPERIMENT_THREADS   限制數值函式庫執行緒數。設為 1 可提升數值確定性，
                          代價是顯著增加執行時間。未設定時使用全部核心。
-    USE_CACHED_FEATURES  設為 1 時，若 dataset c 的特徵清單快取存在則直接讀取，
-                         略過耗時的 RFECV。詳見 REPRODUCIBILITY.md。
+    USE_CACHED_FEATURES  已移除（2026-09-06）。此邏輯原本只存在於產物
+                         src/run_experiment.py，未寫入 notebook，
+                         因此在重新轉換時消失。詳見 REPRODUCIBILITY.md 第 7 節。
 """
 import os
 import time
