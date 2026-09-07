@@ -86,6 +86,16 @@ ODDS_CSV      = 'data/cbs_moneyline_2024_2026_331.csv'
 
 split = TimeSeriesSplit(n_splits=N_SPLITS)
 print('套件與設定載入完成')
+# --- 純函式已抽離至 src/betting_math.py（見 src/test_betting_math.py）---
+import sys
+from pathlib import Path
+_SRC = Path('src').resolve()
+if _SRC.is_dir() and str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from betting_math import (
+    haversine_km, american_to_decimal, kelly_fraction, expected_value
+)
 
 
 # ==========================================================================
@@ -203,12 +213,6 @@ arena_coords = {
     'POR':(45.5316,-122.6668), 'SAC':(38.6490,-121.5180),'SAS':(29.4270,-98.4375),
     'TOR':(43.6435,-79.3791),  'UTA':(40.7683,-111.9011),'WAS':(38.8981,-77.0209),
 }
-def haversine_km(lat1, lon1, lat2, lon2):
-    R = 6371.0
-    lat1r, lat2r = np.radians(lat1), np.radians(lat2)
-    dlat = np.radians(lat2 - lat1); dlon = np.radians(lon2 - lon1)
-    a = np.sin(dlat/2)**2 + np.cos(lat1r)*np.cos(lat2r)*np.sin(dlon/2)**2
-    return 2 * R * np.arcsin(np.sqrt(a))
 
 df['game_lat'] = np.where(df['home']==1,
     df['team'].map(lambda t: arena_coords.get(t, (0,0))[0]),
@@ -360,27 +364,12 @@ base_est_rfecv = LogisticRegression(
 rfecv = RFECV(
     estimator=base_est_rfecv, step=5, cv=split,
     scoring='roc_auc', min_features_to_select=10, n_jobs=-1)
-# 特徵清單為研究決策的產物，而非執行細節。首次計算後固化為 artifact，
-# 後續執行直接讀取，避免下游結果依賴 RFECV 的重新計算。
-# 詳見 REPRODUCIBILITY.md 第 6.2 節。
-_FEATURE_CACHE = os.path.join(OUTPUT_DIR, 'dataset_c_features.txt')
+rfecv.fit(train_data[all_features], y_train)
 
-if os.environ.get('USE_CACHED_FEATURES') == '1' and os.path.exists(_FEATURE_CACHE):
-    with open(_FEATURE_CACHE, encoding='utf-8') as _f:
-        datasets['c'] = [_l.strip() for _l in _f
-                         if _l.strip() and not _l.startswith('#')]
-    print(f"dataset c: 自快取讀入 {len(datasets['c'])} 特徵（略過 RFECV）")
-else:
-    rfecv.fit(train_data[all_features], y_train)
-    datasets['c'] = [c for c, keep in zip(all_features, rfecv.support_) if keep]
-    rfecv_obj = rfecv
-    print(f"dataset c (RFECV): {len(datasets['c'])} 特徵"
-          f"（CV 最佳 AUC = {rfecv.cv_results_['mean_test_score'].max():.4f}）")
-    with open(_FEATURE_CACHE, 'w', encoding='utf-8') as _f:
-        _f.write(f"# dataset c 特徵清單，由 RFECV 產生\n")
-        _f.write(f"# CV 最佳 AUC = {rfecv.cv_results_['mean_test_score'].max():.4f}\n")
-        _f.write("\n".join(datasets['c']) + "\n")
-    print(f"dataset c: 特徵清單已寫入 {_FEATURE_CACHE}")
+datasets['c'] = [c for c, keep in zip(all_features, rfecv.support_) if keep]
+rfecv_obj = rfecv
+print(f"dataset c (RFECV): {len(datasets['c'])} 特徵"
+      f"（CV 最佳 AUC = {rfecv.cv_results_['mean_test_score'].max():.4f}）")
 
 # === 4.5 dataset d：ElasticNetCV 嵌入式特徵選擇 ===
 # 以 ElasticNet 正則化之 Logistic Regression 進行嵌入式選擇（係數壓縮至 0 者剔除）。
@@ -634,12 +623,6 @@ map_abbrev = lambda a: CBS_TO_BBREF.get(a, a)
 odds_raw['home_team_bbref'] = odds_raw['home_abbrev'].apply(map_abbrev)
 odds_raw['away_team_bbref'] = odds_raw['away_abbrev'].apply(map_abbrev)
 
-# American ML → Decimal odds
-def american_to_decimal(ml):
-    ml = float(ml)
-    if ml > 0:   return 1 + ml / 100
-    elif ml < 0: return 1 + 100 / abs(ml)
-    return 2.0
 odds_raw['home_decimal_odds'] = odds_raw['home_ml'].apply(american_to_decimal)
 odds_raw['away_decimal_odds'] = odds_raw['away_ml'].apply(american_to_decimal)
 
@@ -708,14 +691,6 @@ for name, inst in raw_models.items():
 print('七個模型之原始版與校準版已訓練完成')
 
 # === 6.3 投注函數：Kelly、EV、模擬器、雙視角共識 ===
-def kelly_fraction(model_prob, decimal_odds):
-    b = decimal_odds - 1
-    if b <= 0: return 0.0
-    f = (model_prob * b - (1 - model_prob)) / b
-    return max(f, 0.0)
-
-def expected_value(model_prob, decimal_odds):
-    return model_prob * (decimal_odds - 1) - (1 - model_prob)
 
 def run_unified_simulation(df_odds, model_probs, consensus_mask=None,
                            initial_bankroll=INIT_BANKROLL, kelly_multiplier=KELLY_ALPHA,
