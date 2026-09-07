@@ -152,7 +152,39 @@ terraform destroy
 
 ---
 
-## 7. 相關檔案
+## 7. 已知問題：build artifact 與來源不一致
+
+2026-09-06 為了替純函式補上單元測試，將 `haversine_km`、`american_to_decimal`、
+`kelly_fraction`、`expected_value` 自 notebook 抽離至 `src/betting_math.py`，
+並以 `tools/nb2py.py` 重新產生 `src/run_experiment.py`。重新產生後發現：
+
+**產物中有一段程式碼不存在於來源。** `src/run_experiment.py` 原本含有一段
+`USE_CACHED_FEATURES` 的特徵清單快取邏輯 —— 首次計算後將 dataset c 的特徵清單
+寫入 `outputs/dataset_c_features.txt`，之後直接讀取以跳過 RFECV 重算。
+該段程式碼從未寫入 notebook，是當初直接編輯產物加入的，因此在重新轉換時消失。
+
+這違反了 `src/run_experiment.py` 檔頭自述的規則（「請勿直接編輯本檔；
+實驗邏輯的修改應於 notebook 進行後重新轉換」），也違反 12-Factor 第 5 條
+build / release / run 分離的前提：**產物必須能自來源完整重建。**
+
+### 為何未於本次修復
+
+補回程式碼並不足以修復此問題。`outputs/` 已被 `.gitignore` 排除，
+`dataset_c_features.txt` 從未進入版本控制，clone 本 repo 者手上沒有這份清單，
+仍會走 RFECV 重算路徑。而 RFECV 的 argmax 正是本報告第 3.1 節所述的放大點。
+
+完整修復需要一併決定「特徵清單應以何種身分存在」——是納入版控的固定 artifact，
+或是每次重算並接受其不確定性。這是一項設計決策，不宜與本次重構混在同一個變更內。
+
+### 目前狀態
+
+- `src/run_experiment.py` 已與 notebook 同步，快取邏輯已移除
+- 執行完整實驗時 RFECV 會重新計算，耗時增加
+- `tools/nb2py.py` 檔頭關於 `USE_CACHED_FEATURES` 的說明已標註為已移除
+
+---
+
+## 8. 相關檔案
 
 | 路徑 | 說明 |
 |---|---|
